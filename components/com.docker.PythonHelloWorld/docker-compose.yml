@@ -1,0 +1,11 @@
+version: "3"
+services:
+  python-hello-world:
+    image: "{ECR_REPO}/python-hello-world:latest"
+    environment:
+      - SVCUID
+      - AWS_GG_NUCLEUS_DOMAIN_SOCKET_FILEPATH_FOR_COMPONENT
+      - MQTT_TOPIC
+      - MQTT_MESSAGE
+    volumes:
+      - ${AWS_GG_NUCLEUS_DOMAIN_SOCKET_FILEPATH_FOR_COMPONENT}:${AWS_GG_NUCLEUS_DOMAIN_SOCKET_FILEPATH_FOR_COMPONENT}

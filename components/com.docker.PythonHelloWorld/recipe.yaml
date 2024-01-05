@@ -1,0 +1,38 @@
+---
+RecipeFormatVersion: "2020-01-25"
+ComponentName: "{COMPONENT_NAME}"
+ComponentVersion: "{COMPONENT_VERSION}"
+ComponentDescription: "Publish and subscribe using IPC operations through Docker."
+ComponentPublisher: "{COMPONENT_AUTHOR}"
+ComponentConfiguration:
+  DefaultConfiguration:
+    Message: "Hello from local pubsub topic"
+    Topic: "/topic/local/pubsub"
+    accessControl:
+      aws.greengrass.ipc.pubsub:
+        com.docker.{COMPONENT_NAME}:pubsub:1:
+          policyDescription: Allows access to publish and subscribe to topic /topic/local/pubsub.
+          operations:
+            - aws.greengrass#SubscribeToTopic
+            - aws.greengrass#PublishToTopic
+          resources:
+            - "/topic/local/pubsub"
+ComponentDependencies:
+  aws.greengrass.DockerApplicationManager:
+    VersionRequirement: ~2.0.0
+  aws.greengrass.TokenExchangeService:
+    VersionRequirement: ~2.0.0
+Manifests:
+  - Platform:
+      os: all
+    Artifacts:
+      - URI: "docker:{ECR_REPO}/python-hello-world:latest"
+      - URI: "s3://BUCKET_NAME/COMPONENT_NAME/COMPONENT_VERSION/com.docker.PythonHelloWorld.zip"
+        Unarchive: ZIP
+    Lifecycle:
+      Run: 
+        RequiresPrivilege: True
+        Script: |
+          MQTT_TOPIC="{configuration:/Topic}" \
+          MQTT_MESSAGE="{configuration:/Message}" \
+          docker-compose -f {artifacts:decompressedPath}/com.docker.PythonHelloWorld/docker-compose.yml up
